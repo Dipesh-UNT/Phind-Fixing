@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyFlix</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .movie-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .movie-card img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease-in-out;
+        }
+        .movie-card:hover img {
+            transform: scale(1.1);
+        }
+        .movie-card .movie-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .movie-card:hover .movie-info {
+            opacity: 1;
+        }
+        .movie-info h4 {
+            margin: 0;
+        }
+        .movie-info p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-dark text-white p-3">
+        <h1>MyFlix</h1>
+        <form class="form-inline">
+            <label for="searchBar" class="mr-2">Search for movies:</label>
+            <input type="text" id="searchBar" class="form-control" placeholder="Enter movie title...">
+        </form>
+    </header>
+
+    <div class="container mt-4">
+        <div class="row" id="movieGrid">
+            <!-- Movie cards will be dynamically added here -->
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white p-3 mt-4">
+        <p>© 2024 MyFlix. All rights reserved.</p>
+    </footer>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        const apiKey = '1a501fcb';
+        const searchBar = document.getElementById('searchBar');
+        const movieGrid = document.getElementById('movieGrid');
+
+        searchBar.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                fetchMovies(searchBar.value);
+            }
+        });
+
+        function fetchMovies(query) {
+            fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Search) {
+                        displayMovies(data.Search.slice(0, 16)); // Display only the first 16 results
+                    } else {
+                        movieGrid.innerHTML = '<div class="col-md-3">No movies found.</div>';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayMovies(movies) {
+            movieGrid.innerHTML = '';
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'col-md-3 movie-card';
+                movieCard.innerHTML = `
+                    <img src="${movie.Poster}" alt="${movie.Title}">
+                    <div class="movie-info">
+                        <h4>${movie.Title}</h4>
+                        <p>${movie.Year}</p>
+                    </div>
+                `;
+                movieGrid.appendChild(movieCard);
+            });
+        }
+    </script>
+</body>
+</html>
